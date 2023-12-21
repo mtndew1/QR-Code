@@ -2,17 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scan QR Code</title>
+  <title>QR Code Scanner</title>
 </head>
 <body>
-  <h1>请扫描二维码</h1>
-  <button onclick="sendData()">已注册</button>
+  <h1>QR Code Scanner</h1>
+  <video id="qr-video" width="400" height="300" autoplay></video>
 
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.0.0/dist/jsQR.js"></script>
   <script>
-    function sendData() {
-      // 发送请求到服务器，这里我们只是模拟一个请求
-      // 在实际情况下，需要将数据发送到服务器端脚本来更新 Google Sheets
-      alert("您已成功注册！");
+    const video = document.getElementById('qr-video');
+
+    // 打开相机
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function(stream) {
+        video.srcObject = stream;
+      })
+      .catch(function(err) {
+        console.error('Error accessing the camera:', err);
+      });
+
+    // 当视频播放时尝试解析二维码
+    video.addEventListener('play', function() {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      setInterval(function() {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (code) {
+          handleQRCode(code.data); // 处理二维码数据
+        }
+      }, 1000);
+    });
+
+    function handleQRCode(qrData) {
+      // 在这里添加发送二维码数据到服务器端的逻辑
+      // 可以使用 fetch 或 XMLHttpRequest 发送数据到服务器端
     }
   </script>
 </body>
