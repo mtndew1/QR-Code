@@ -9,36 +9,40 @@
   <video id="qr-video" width="400" height="300" autoplay></video>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.0.0/dist/jsQR.js"></script>
-  <script>
-    const video = document.getElementById('qr-video');
+<script>
+  const video = document.getElementById('qr-video');
 
-    // 打开相机
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(function(stream) {
-        video.srcObject = stream;
-      })
-      .catch(function(err) {
-        console.error('Error accessing the camera:', err);
-      });
-
-    // 当视频播放时尝试解析二维码
-    video.addEventListener('play', function() {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      setInterval(function() {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        if (code) {
-          handleQRCode(code.data); // 处理二维码数据
-        }
-      }, 1000);
+  // 打开相机
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      video.srcObject = stream;
+    })
+    .catch(function(err) {
+      console.error('Error accessing the camera:', err);
     });
 
-    function handleQRCode(qrData) {
-      // 在这里添加发送二维码数据到服务器端的逻辑
-      // 可以使用 fetch 或 XMLHttpRequest 发送数据到服务器端
-    }
-  </script>
+  // 当视频播放时尝试解析二维码
+  video.addEventListener('play', function() {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    setInterval(function() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code) {
+        console.log('Detected QR code:', code.data);
+        handleQRCode(code.data); // 处理二维码数据
+      } else {
+        console.log('No QR code detected!');
+      }
+    }, 1000);
+  });
+
+  function handleQRCode(qrData) {
+    // 在这里添加发送二维码数据到服务器端的逻辑
+    // 可以使用 fetch 或 XMLHttpRequest 发送数据到服务器端
+  }
+</script>
+
 </body>
 </html>
